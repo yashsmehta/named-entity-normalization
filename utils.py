@@ -33,3 +33,15 @@ def parse_args():
     ap.add_argument("-seed", type=int, default=0)
     args = ap.parse_args()
     return args.inp_dir, args.seed
+
+
+512 -  - 32 - 
+
+def parse_args_extractor():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-datafile", type=str, default='data/entity_class/')
+    ap.add_argument("-max_token_length", type=int, default=512)
+    ap.add_argument("-batch_size", type=int, default=32)
+    ap.add_argument("-op_dir", type=str, default='data/pkl_data')
+    args = ap.parse_args()
+    return args.datafile, args.max_token_length, args.batch_size, args.op_dir

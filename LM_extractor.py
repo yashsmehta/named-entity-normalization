@@ -23,13 +23,11 @@ else:
     print('running on cpu')
 
 n_hl = 12
-batch_size = 32
 hidden_dim = 768
-max_token_length = 512
+datafile, max_token_length, batch_size, op_dir = utils.parse_args_extractor()
+
 entity_class = 'countries'
 entity_class_id = 1
-datafile = 'data/' + entity_class + '.txt'
-op_dir = 'data/pkl_data/'
 
 model_class, tokenizer_class, pretrained_weights = AlbertModel, AlbertTokenizer, 'albert-base-v2'
 
