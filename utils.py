@@ -3,6 +3,7 @@ import numpy as np
 import argparse
 from datetime import datetime, timedelta
 
+#log relevant information, saving the results along with the meta data of the network.
 def file_writer(results_file, meta_info, acc, loss_val):
     lr, epochs, seed = meta_info
     params = [" LR ", str(lr), " SEED ", str(seed), " EPOCHS ", str(epochs)]
@@ -27,15 +28,13 @@ def str_to_bool(value):
     raise ValueError(f'{value} is not a valid boolean value')
 
 
+# parse info from the user on the parameters of the run of the program
 def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("-inp_dir", type=str, default='data/pkl_data/')
     ap.add_argument("-seed", type=int, default=0)
     args = ap.parse_args()
     return args.inp_dir, args.seed
-
-
-512 -  - 32 - 
 
 def parse_args_extractor():
     ap = argparse.ArgumentParser()

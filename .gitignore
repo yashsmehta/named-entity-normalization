@@ -1,3 +1,4 @@
 logs/
 ws.code-workspace
 pkl_data/*
+.vscode

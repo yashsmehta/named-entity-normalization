@@ -10,6 +10,10 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 from transformers import *
 
+# This file passes the 'description' paragraph of the passed item through a language model (used ALBERT) to get a 768 dim vector representation of the 
+# paragraph. The point of this is so that we can create a heirarchial category graph by evaluating how 'similar' (e.g. cosine similarity) the vectors of 2 
+# descriptions are. I make use of the HuggingFace implementation of ALBERT.
+
 start = time.time()
 
 if torch.cuda.is_available():
@@ -22,6 +26,7 @@ else:
     DEVICE = torch.device('cpu')
     print('running on cpu')
 
+# using ALBERT-small model
 n_hl = 12
 hidden_dim = 768
 datafile, max_token_length, batch_size, op_dir = utils.parse_args_extractor()
@@ -36,6 +41,7 @@ tokenizer = tokenizer_class.from_pretrained(pretrained_weights, do_lower_case=Tr
 
 map_dataset = MyMapDataset(datafile, tokenizer, max_token_length, DEVICE, entity_class_id)
 
+#class to load information in the form of a pyTorch dataset; 
 data_loader = DataLoader(dataset=map_dataset,
                          batch_size=batch_size,
                          shuffle=False,
@@ -48,6 +54,7 @@ if (DEVICE == torch.device("cuda")):
 
 print('starting to extract LM embeddings...')
 
+# for the initial training phase, we need to have 'targets', which can be either manually assigned or synthetically created. 
 hidden_features = []
 all_targets = []
 
@@ -62,6 +69,9 @@ for input_ids, targets in data_loader:
             
         hidden_features.append(np.array(tmp))
     
+# Save the LM embeddings in a file to save time/computation. So that for every training session, we are not going online to parse information and are saving the 
+# description paragraph embedding in a file.
+
 file = open(op_dir + '-' + entity_class + 'embedings.pkl', 'wb')
 pickle.dump(zip(hidden_features, all_targets), file)
 file.close()

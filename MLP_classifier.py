@@ -14,6 +14,9 @@ import utils
 
 start = time.time()
 
+# This file contains a simple MLP which takes inputs as description paragraph embedding (extracted by the language model (LM)) and classifies it into the 
+# entity class (e.g. Physical Goods, Locations, etc.)
+
 inp_dir, seed = utils.parse_args()
 n_classes = 2
 write_file = True
@@ -23,13 +26,15 @@ tf.random.set_seed(seed)
 
 hidden_dim = 768
 
-#modify this to load embeddings for all entity classes!
+#load embeddings from file
 file = open(inp_dir + entity_class + '-' + 'embedings.pkl', 'rb')
 
 data = pickle.load(file)
 data_x, data_y = list(zip(*data))
 file.close()
 
+# alphaW are the weights which decide which layer (1-12) of the LM embeddings are to be used. I use the pre-final layer as it has been shown to encode the 
+# best representation of a sentence / paragraph 
 alphaW = np.zeros([12])
 alphaW[11] = 1
 
@@ -52,6 +57,7 @@ targets = tf.keras.utils.to_categorical(targets, num_classes=n_classes)
 
 model = tf.keras.models.Sequential()
 
+# a simple MLP for making entity category predictions with architecture: 768 -> 50 -> NUM_CLASSES
 model.add(tf.keras.layers.Dense(50, input_dim=hidden_dim, activation='relu'))
 model.add(tf.keras.layers.Dense(n_classes))
 
@@ -61,16 +67,19 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=lr),
 
 print(model.summary())
 
+# store the training metrics in 'history'
 history = model.fit(inputs, targets, epochs=epochs, batch_size=batch_size,
                     validation_split=0.2)
-
+ 
 print('acc: ', history.history['accuracy'])
 print('val acc: ', history.history['val_accuracy'])
 
 print(timedelta(seconds=int(time.time() - start)), end=' ')
 
+# save the trained model to be used for inference
 model.save('models')
 
+# save training metrics
 if(write_file):
     results_file = 'mlp_results.csv'
     meta_info = (lr, epochs, seed)

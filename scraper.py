@@ -6,6 +6,8 @@ import wikipediaapi as wp
 
 from bs4 import BeautifulSoup
 
+#a script which searches the web for a particular item, goes to the wikipedia page for that item and downloads the first paragraph from the wiki page.
+
 def get_wiki_para(query):
     query += " wikipedia"
     query = query.replace(' ', '+')
@@ -18,6 +20,7 @@ def get_wiki_para(query):
     resp = requests.get(URL, headers=headers)
 
     if resp.status_code == 200:
+        #Beautiful soup library gets the web page content in a 'nice' format.
         soup = BeautifulSoup(resp.content, "html.parser")
 
     for g in soup.find_all('div', class_='r'):
@@ -25,6 +28,8 @@ def get_wiki_para(query):
         if anchors:
             URL = anchors[0]['href']
             title = g.find('h3').text
+            #in all the weblinks in the first page of the google search results, go to the wikipedia link for the item. If a company/item doesn't have a wiki page,
+            # will have to have a backup in place which scrapes a description paragraph from some other source.
             match = re.search('wikipedia', URL)
             if(match):
                 break
@@ -32,6 +37,7 @@ def get_wiki_para(query):
     page = requests.get(URL)
     wiki = BeautifulSoup(page.text, 'html.parser')
 
+    #return the first paragraph of the wiki page
     for i in wiki.select('p'):
         return i.getText()
 
@@ -40,6 +46,9 @@ def print_categories(page):
     categories = page.categories
     for title in sorted(categories.keys()):
         print("%s: %s" % (title, categories[title]))
+
+# a function to get the a list of major the major cities in the world. If we have a list of all the cities, countries and regions, we can filter out the 
+# 'locations' category.
 
 def get_cities_list():
     URL = 'https://en.wikipedia.org/wiki/List_of_largest_cities'
