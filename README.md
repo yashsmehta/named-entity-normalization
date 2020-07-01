@@ -1,6 +1,20 @@
 # Language Models for Named Entity Normalization
 This repository is a set of experiments written in tensorflow + pytorch to explore further in the direction of how scraping internet data and language models can be used for more enhanced and robust named entity normalization.
 
+## Method
+Let's say we are given a raw list of entities (e.g. Marks and Spencers Ltd, LONDON, etc.) which are not annotated with the 
+entity class (e.g. Physical Goods, Company names, etc.). Let's say a new entry is 'Marks and Spencers Ltd' and we dont know that this entity comes
+under the 'Company names' class. The code performs 2 tasks:
+1. Predict the class of the entity
+     1. Get a paragraph describing the word, get a vector representation (768 dim in this case) of this paragraph by passing it
+              through an **language model** (LM) (e.g. BERT)
+     2. Feed this embedding vector to a shallow MLP classifier to make the prediction of what entity class the new entity belongs to.
+              
+2. After predicting the entity class, use a similarity metric with the other entries within that class to determine if the new entry is of a new 'type'
+     or should be stored under a particular entry. Let's say 'M&S Limited' is already present in the graph. We get the embeddings and prediction for 'Marks and  Spencers Ltd'. Now, use a similarity measure (e.g. **cosine similarity**) to see how 'close' is the current embedding and the other embeddings in the 'Company Names' class. Have a threshold value, if max similarity is less than that, create a new item, else store this under an existing class.
+
+
+In this case, any new entity doesn't need to have a labelled entity class. It's also easy to incorporate new entity classes and store them in a hierarchical graph-like structure to keep a more organized track of inventory.
 ## Installation
 
 Pull this repository from Git via:
